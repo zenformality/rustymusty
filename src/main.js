@@ -2,6 +2,7 @@ import './style.css'
 
 const form = document.getElementById('search-form')
 const queryInput = document.getElementById('query')
+const engineSelect = document.getElementById('engine')
 const historyEl = document.getElementById('history')
 
 const engines = {
@@ -48,34 +49,22 @@ function escapeHtml(str) {
   return div.innerHTML
 }
 
-let lastEngine = null
-
-form.addEventListener('submit', e => {
-  e.preventDefault()
-})
-
-form.addEventListener('click', e => {
-  const btn = e.target.closest('button[data-engine]')
-  if (!btn) return
-
+function doSearch() {
   const query = queryInput.value.trim()
   if (!query) return
 
-  const engine = btn.dataset.engine
-  lastEngine = engine
+  const engine = engineSelect.value
   saveHistory(query, engine)
   window.open(engines[engine] + encodeURIComponent(query), '_blank')
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault()
+  doSearch()
 })
 
 queryInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const query = queryInput.value.trim()
-    if (!query) return
-
-    const engine = lastEngine || 'google'
-    saveHistory(query, engine)
-    window.open(engines[engine] + encodeURIComponent(query), '_blank')
-  }
+  if (e.key === 'Enter') doSearch()
 })
 
 renderHistory()

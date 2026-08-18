@@ -13,10 +13,13 @@
       <p class="tagline">search the web</p>
 
       <form id="search-form" class="search-box">
-        <input type="text" id="query" placeholder="type something..." autofocus>
-        <div class="btn-row">
-          <button type="submit" data-engine="google">google</button>
-          <button type="submit" data-engine="duckduckgo">duckduckgo</button>
+        <div class="input-row">
+          <input type="text" id="query" placeholder="type something..." autofocus>
+          <select id="engine">
+            <option value="google">google</option>
+            <option value="duckduckgo">duckduckgo</option>
+          </select>
+          <button type="submit">→</button>
         </div>
       </form>
 
@@ -25,7 +28,7 @@
   </main>
 
   <footer>
-    built by zenx · powered by google & duckduckgo
+    built with 💕 | :)
   </footer>
 
   <script type="module" src="/src/main.js"></script>
