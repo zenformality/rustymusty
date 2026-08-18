@@ -1,6 +1,8 @@
 # rustymusty
 
-a simple search engine page. pick google or duckduckgo from the dropdown and search.
+a simple search engine page. type a query, pick google or duckduckgo from the dropdown, and hit enter or click the arrow to search. searches open in a new tab.
+
+recent searches are saved in your browser (localStorage) so you can quickly re-search something.
 
 ## stack
 
