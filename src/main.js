@@ -1,60 +1,134 @@
-import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
+import '.styles.css';
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const API_KEY = import.meta.env.VITE_NASA_API_KEY;
+const app = document.querySelector('#app');
+const datepicker = document.querySelector('#datepicker');
+const goBtn = document.querySelector('#go-btn');
+const todayBtn = document.querySelector('#today-btn');
 
-<div class="ticks"></div>
+function updateClock() {
+    const now = new Date();
+  const time = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    });
+  const date = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    });
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+  document.getElementById('clock').innerHTML =
+    `<span class="clock-time">${time}</span><span class="clock-date">${date}</span>`
+}
+updateClock();
+setInterval(updateClock, 1000);
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
 
-setupCounter(document.querySelector('#counter'))
+function todayString() {
+  return new Date().toISOString().split('T')[0];
+}
+
+datepicker.max = todayString();
+datepicker.value = todayString();
+
+
+
+function buildMedia(data) {
+  if (data.media_type === 'image') {
+    return `<img class="apod-img" src="${data.url}" alt="${data.title}" loading="lazy" />`;
+  }
+  if (data.url.includes('youtube') || data.url.includes('youtu.be')) {
+
+    return `
+         <div class="video-wrap">
+           <iframe
+             class="apod-iframe"
+             src="${data.url}"
+             title="${data.title}"
+             frameborder="0"
+             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+             allowfullscreen
+           ></iframe>
+         </div>`;
+     }
+     return `<video class="apod-video" src="${data.url}" controls></video>`;
+   }
+  
+function fetchAPOD(date) {
+  app.innerHTML = `<p class="loading">searching the cosmos for ${date}...</p>`;
+
+  
+  const dateParam = date ? `&date=${date}` : '';
+  const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}${dateParam}`;
+
+  fetch(url)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return res.json();
+    })
+    .then((data) => {
+      
+      const media = buildMedia(data);
+      const formattedDate = new Date(data.date + 'T00:00:00').toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      const copyright = data.copyright
+        ? `<span class="copyright">© ${data.copyright.trim()}</span>`
+               : '';
+
+      app.innerHTML = `
+              <article class="apod-card">
+                <div class="apod-meta">
+                  <span class="apod-date">${formattedDate}</span>
+                  ${copyright}
+                </div>
+                <h1 class="apod-title">${data.title}</h1>
+                <div class="apod-media">${media}</div>
+                <p class="apod-explanation">${data.explanation}</p>
+                <a
+                  class="apod-hdlink"
+                  href="${data.hdurl || data.url}"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  view full resolution ↗
+                </a>
+              </article>
+            `;
+          })
+
+    .catch((err) => {
+      app.innerHTML = `
+             <div class="error-card">
+               <span class="error-icon">🛸</span>
+               <h2>Houston, we have a problem.</h2>
+               <p>${err.message}</p>
+               <p class="error-hint">Check your API key in <code>.env</code> and restart the dev server.</p>
+             </div>
+           `;
+         });
+}
+
+goBtn.addEventListener('click', () => {
+  if (datepicker.value) fetchAPOD(datepicker.value);
+});
+
+datepicker.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') fetchAPOD(datepicker.value);
+});
+
+todayBtn.addEventListener('click', () => {
+  datepicker.value = todayString();
+  fetchAPOD(todayString());
+});
+
+fetchAPOD(todayString());
