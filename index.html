@@ -2,42 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rustymusty</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">♨️</span>
-        <span class="logo-text">rustymusty</span>
-      </div>
-      <div class="header-right">
-        <div id="clock" class="clock"></div>
-        <div class="date-picker-wrap">
-          <label for="datepicker">📅</label>
-          <input type="date" id="datepicker">
-          <button id="go-btn">Go</button>
-          <button id="today-btn">Today</button>
-        </div>
-      </div>
-    </div>
-  </header>
-
   <main>
-    <div id="app">
-      <p class="loading">loading today's cosmos...</p>
+    <div class="center">
+      <h1 class="title">♨️ rustymusty</h1>
+      <p class="tagline">search the web</p>
+
+      <form id="search-form" class="search-box">
+        <input type="text" id="query" placeholder="type something..." autofocus>
+        <div class="btn-row">
+          <button type="submit" data-engine="google">google</button>
+          <button type="submit" data-engine="duckduckgo">duckduckgo</button>
+        </div>
+      </form>
+
+      <div id="history" class="history"></div>
     </div>
   </main>
 
-  <footer class="site-footer">
-    <p>
-      powered by
-      <a href="https://api.nasa.gov/" target="_blank" rel="noopener">NASA API</a>
-      * built with 💕 by zenx / zi
-    </p>
+  <footer>
+    built by zenx · powered by google & duckduckgo
   </footer>
 
   <script type="module" src="/src/main.js"></script>
